@@ -81,16 +81,16 @@ plot(log(rd2$wd_unweighted/rd2$wd_radially_weighted) ~ log(rd2$wd_ratio_outer_in
      xlim = c(-.5, .5), ylim = c(-.2,.1))
 summary(lm(log(rd2$wd_unweighted/rd2$wd_radially_weighted) ~ log(rd2$wd_ratio_outer_inner)))
 
-regression1_code <- make_stancode(agb_diff ~ hab * DBH + wd_ratio_outer_inner * DBH + (1| species + genus + family + transect + plot), data = rd2)
+regression1_code <- make_stancode(agb_diff ~ hab * DBH + wd_ratio_outer_inner * DBH + (1 | species + genus + family + transect + plot), data = rd2)
 
 fileConn<-file("/Users/jacobsocolar/Dropbox/Work/Code/juruaTrees/regression1.stan")
 writeLines(regression1_code, fileConn)
 close(fileConn)
 
-regression1_data <- make_standata(agb_diff ~ hab * DBH + wd_ratio_outer_inner * DBH + (1| species + genus + family + transect + plot), data = rd2)
+regression1_data <- make_standata(agb_diff ~ hab * DBH + wd_ratio_outer_inner * DBH + (1 | species + genus + family + transect + plot), data = rd2)
 class(regression1_data) <- "list"
 
-regression1_brms <- brm(agb_diff ~ hab * DBH + wd_ratio_outer_inner * DBH + (1| species + genus + family + transect + plot), data = rd2)
+regression1_brms <- brm(agb_diff ~ hab * DBH + wd_ratio_outer_inner * DBH + (1 | species + genus + family + transect + plot), data = rd2)
 
 regression1_model <- cmdstan_model("/Users/jacobsocolar/Dropbox/Work/Code/juruaTrees/regression1.stan")
 regression1_fit_full_warmup <- regression1_model$sample(data = as.list(regression1_data))
@@ -127,6 +127,15 @@ for(i in 1:100){
   
   posterior_list[[i]] <- as_draws_df(regression1_fit_i$draws())
 }
+
+
+summary(colSums(v$agb_1)/colSums(v$agb_2))
+
+quantile(1-colSums(v$agb_1)/colSums(v$agb_2), .025)
+quantile(1-colSums(v$agb_1)/colSums(v$agb_2), .975)
+
+
+hist(colSums(v$agb_1)/colSums(v$agb_2))
 
 combined_posterior <- do.call(rbind, posterior_list)
 cps <- summarise_draws(combined_posterior)
