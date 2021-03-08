@@ -30,8 +30,9 @@ stem_data_t <- stem_data[stem_data$Habitat == "tf", ]
 
 # Here's an example of how it works
 v <- AGBmc2(D = stem_data_v$DBH_cm, 
-            WD1 = stem_data_v$wWD, WD2 = stem_data_v$taxonomic_WD_matrix, 
-            H1 = stem_data_v$gold_std_height, coord2 = cbind(stem_data_v$long, stem_data_v$lat))
+            WD1 = stem_data_v$wWD, WD2 = stem_data_v$wWD_s, 
+            H1 = stem_data_v$gold_std_height, H2=NULL)
+
 tf <- AGBmc2(D = stem_data_t$DBH_cm, 
                   WD1 = stem_data_t$wWD, WD2 = stem_data_t$taxonomic_WD_matrix, 
                   H1 = stem_data_t$gold_std_height, coord2 = cbind(stem_data_t$long, stem_data_t$lat))
@@ -46,17 +47,40 @@ agb_diff_t <- log(tf$agb_2/tf$agb_1)
 hist(agb_diff_v[,1])
 plot(agb_diff_v[,1] ~ stem_data_v$DBH_cm)
 
-# Here's an example of how to set up the regression
+# Here's an example of how to set up the regression for one column.  Ultimately this regression
+# needs to be iterated over columns (maybe a sample of 50 or 100 columns rather than all 1000),
+# and the resulting posteriors need to be combined for inference.
 stem_data2 <- rbind(stem_data_v, stem_data_t)
+stem_data2$wd_ratio_outer_inner <- stem_data2$wd_50/stem_data2$wd_M
 
 regression_data <- data.frame(agb_diff = c(agb_diff_v[,1], agb_diff_t[,1]), 
-                              DBH = stem_data2$DBH_cm, rch = stem_data2$rch,
-                              wd = stem_data2$wWD, genus = stem_data2$gen, 
                               transect = stem_data2$Transect, 
                               plot = stem_data2$plot_ID,
-                              hab = stem_data2$Habitat)
-rd2 <- regression_data[!is.na(regression_data$genus), ]
+                              hab = stem_data2$Habitat,
+                              species = stem_data2$sp,
+                              genus = stem_data2$gen, 
+                              family = stem_data2$fam,
+                              DBH = stem_data2$DBH_cm, 
+                              wd_radially_weighted = stem_data2$wWD,
+                              wd_unweighted = stem_data2$uWD,
+                              wd_ratio_outer_inner = stem_data2$wd_ratio_outer_inner
+)
+sum(is.na(regression_data$family))
+sum(is.na(regression_data$genus))
+sum(is.na(regression_data$species))
+sum(is.na(regression_data$rch) | is.infinite(regression_data$rch))
+sum(is.infinite(regression_data$rch) | is.na(regression_data$species))
+rd2 <- regression_data[!is.na(regression_data$species) & !is.infinite(regression_data$wd_ratio_outer_inner), ]
 
-mymod <- brm(agb_diff ~ hab + DBH + rch + wd + (1|genus + transect + plot), data = rd2)
+pairs(rd2[,c("agb_diff", "DBH", "wd_radially_weighted", "wd_unweighted", "wd_ratio_outer_inner")])
+plot(log(rd2$wd_unweighted/rd2$wd_radially_weighted) ~ log(rd2$wd_ratio_outer_inner))
+plot(log(rd2$wd_unweighted/rd2$wd_radially_weighted) ~ log(rd2$wd_ratio_outer_inner),
+     xlim = c(-.5, .5), ylim = c(-.2,.1))
+summary(lm(log(rd2$wd_unweighted/rd2$wd_radially_weighted) ~ log(rd2$wd_ratio_outer_inner)))
+
+make_stancode(agb_diff ~ hab * DBH + wd_ratio_outer_inner * DBH + (1| species + genus + family + transect + plot), data = rd2)
+make_standata(agb_diff ~ hab * DBH + wd_ratio_outer_inner * DBH + (1| species + genus + family + transect + plot), data = rd2)
+
+mymod <- brm(agb_diff ~ hab * DBH + wd_ratio_outer_inner * DBH + (1| species + genus + family + transect + plot), data = rd2)
 summary(mymod)
 
