@@ -18,3 +18,5 @@ height_coord_samples <- height_coord_model$sample(data = height_coord_data, para
 height_coord_samples$summary() # Strong match to the values from Chave et al 2014
 
 height_coord_posterior <- as.data.frame(as_draws_df(height_coord_samples$draws()))[4*(1:1000),]
+
+saveRDS(height_coord_posterior, "/Users/JacobSocolar/Dropbox/Work/JuruaTrees/height_coord_posterior.RDS")

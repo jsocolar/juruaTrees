@@ -17,6 +17,61 @@ trees <- readxl::read_excel("/Users/jacobsocolar/Downloads/treeDF.xlsx", sheet =
 # Rename problem transects
 trees$Transect[trees$Transect == "OUP"] <- "OUP_A"
 trees$Transect[trees$Transect == "XNZ"] <- "XZN_A"
+
+##### Insert Yennie's code here #####
+# CORRECT wd_M, wWD & uWD for Tree_Tag = "6809"
+stem_data2<-trees
+# wd_M [869,30]
+stem_data2[869,30]<-(10*(stem_data2[869,30])) 
+# wWD [869,27]
+stem_data2[869,27]<-0.461534032828081 
+# uWD [869,34]
+stem_data2[869,34]<-0.446929148153457 
+
+# subset for Habitat:
+stem_data2tf<-subset(stem_data2, Habitat=="tf")
+stem_data2vz<-subset(stem_data2, Habitat=="vz") # Tree_Tag = 6809 is in vz
+
+# SP:
+stem_data3vz<-subset(stem_data2vz, sp=="Leguminosae_Pterocarpus_rohrii")
+# CORRECT wWD_s for sp="Leguminosae_Pterocarpus_rohrii":
+vz_wWDs<- aggregate(data=stem_data3vz, wWD~sp, FUN = mean)
+stem_data2vz$wWD_s[
+  stem_data2vz$sp == "Leguminosae_Pterocarpus_rohrii"] <- vz_wWDs$wWD
+# CORRECT uWD_s for sp="Leguminosae_Pterocarpus_rohrii":
+vz_uWDs<- aggregate(data=stem_data3vz, uWD~sp, FUN = mean)
+stem_data2vz$uWD_s[
+  stem_data2vz$sp == "Leguminosae_Pterocarpus_rohrii"] <- vz_uWDs$uWD
+
+# GEN:
+stem_data3vz<-subset(stem_data2vz, gen=="Leguminosae_Pterocarpus")
+# CORRECT wWD_g for gen="Leguminosae_Pterocarpus":
+vz_wWDg<- aggregate(data=stem_data3vz, wWD~gen, FUN = mean)
+stem_data2vz$wWD_g[
+  stem_data2vz$gen == "Leguminosae_Pterocarpus"] <- vz_wWDg$wWD
+# CORRECT uWD_g for gen="Leguminosae_Pterocarpus":
+vz_uWDg<- aggregate(data=stem_data3vz, uWD~gen, FUN = mean)
+stem_data2vz$uWD_g[
+  stem_data2vz$gen == "Leguminosae_Pterocarpus"] <- vz_uWDg$uWD
+
+# FAM:
+stem_data3vz<-subset(stem_data2vz, fam=="Leguminosae")
+# CORRECT wWD_f for fam="Leguminosae":
+vz_wWDf<- aggregate(data=stem_data3vz, wWD~fam, FUN = mean)
+stem_data2vz$wWD_f[
+  stem_data2vz$fam == "Leguminosae"] <- vz_wWDf$wWD
+# CORRECT uWD_f for fam="Leguminosae":
+vz_uWDf<- aggregate(data=stem_data3vz, uWD~fam, FUN = mean)
+stem_data2vz$uWD_f[
+  stem_data2vz$fam == "Leguminosae"] <- vz_uWDf$uWD
+
+# JOIN stem_data2vz & stem_data2tf:
+trees <- rbind(stem_data2vz, stem_data2tf)
+##### End Yennie's insertion #####
+
+
+
+
 # Get just trees with heights
 withheight <- trees[!is.na(trees$H_M1) & !is.na(trees$H_M2) & !is.na(trees$H_M3), ]
 # Create a stable stem identifier (that will remain stable even as we subset the data)
@@ -81,7 +136,7 @@ plot(withheight$h1_diff ~ withheight$mean_height)
 mod <- cmdstan_model("/Users/jacobsocolar/Desktop/treeheighterr.stan")
 # Here, we model the height measurements as being drawn from student-t distributions with 3 degrees of freedom
 # (to allow for very heavy-tailed shapes compared to normal distributions)
-samps <- mod$sample(data = list(y1 = withheight$H_M1, y2 = withheight$H_M2, y3 = withheight$H_M3, N=nrow(withheight)), parallel_chains = 4)
+samps <- mod$sample(data = list(y1 = withheight$H_M1, y2 = withheight$H_M2, y3 = withheight$H_M3, N=nrow(withheight)))
 a <- samps$summary()
 max(a$rhat)
 min(a$ess_bulk)

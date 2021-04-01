@@ -32,11 +32,11 @@ stem_data_t <- stem_data[stem_data$Habitat == "tf", ]
 
 # Here's an example of how it works
 v <- AGBmc2(D = stem_data_v$DBH_cm, 
-            WD1 = stem_data_v$wWD, WD2 = stem_data_v$taxonomic_WD_matrix, 
-            H1 = stem_data_v$gold_std_height, coord2 = cbind(stem_data_v$long, stem_data_v$lat))
+            WD1 = stem_data_v$wWD, WD2 = stem_data_v$uWD_s, 
+            H1 = stem_data_v$gold_std_height)
 tf <- AGBmc2(D = stem_data_t$DBH_cm, 
-                  WD1 = stem_data_t$wWD, WD2 = stem_data_t$taxonomic_WD_matrix, 
-                  H1 = stem_data_t$gold_std_height, coord2 = cbind(stem_data_t$long, stem_data_t$lat))
+                  WD1 = stem_data_t$wWD, WD2 = stem_data_t$uWD_s, 
+                  H1 = stem_data_t$gold_std_height)
 
 plot(rowMeans(v$agb_1) ~ rowMeans(v$agb_2))
 abline(a=0, b=1)
@@ -135,7 +135,8 @@ quantile(1-colSums(v$agb_1)/colSums(v$agb_2), .025)
 quantile(1-colSums(v$agb_1)/colSums(v$agb_2), .975)
 
 
-hist(colSums(v$agb_1)/colSums(v$agb_2))
+hist(1-colSums(v$agb_1)/colSums(v$agb_2))
+hist(1-colSums(tf$agb_1)/colSums(tf$agb_2))
 
 combined_posterior <- do.call(rbind, posterior_list)
 cps <- summarise_draws(combined_posterior)

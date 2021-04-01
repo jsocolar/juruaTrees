@@ -17,7 +17,7 @@ stemwise_AGB_diff <- function (D, WD1, WD2 = NULL, H1, H2 = NULL) {
     WD2_expanded <- WD1_expanded
   }else if(is.vector(WD2)){
     WD2_expanded <- replicate(1000, WD2)
-  }else if(is.matrix(WD2 & ncol(WD2)==1000)){
+  }else if(is.matrix(WD2) & ncol(WD2)==1000){
     WD2_expanded <- WD2
   }else{stop('improper size or type for WD2')}
   
@@ -85,8 +85,7 @@ AGBmc2 <- function(D, WD1, WD2 = NULL, H1, errH1 = NULL, H2 = NULL, errH2 = NULL
     }
   }else if(is.matrix(H2) & ncol(H2) == 1000){
     H_2 <- H2
-  }
-  else{stop("problem with H2")}
+  }else{stop("problem with H2")}
   
   return(stemwise_AGB_diff(D = D, WD1 = WD1, WD2 = WD2, H1 = H_1, H2 = H_2))
 }
