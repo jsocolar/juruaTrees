@@ -46,11 +46,11 @@ parameters {
 }
 
 transformed parameters{
-  real<lower = 0, upper = 1> sigma_spatial_plot = sqrt(sigma_spatial^2 * p_spatial_plot);
-  real<lower = 0, upper = 1> sigma_spatial_transect = sqrt(sigma_spatial^2 * (1 - p_spatial_plot));
-  real<lower = 0, upper = 1> sigma_taxonomic_species = sqrt(sigma_taxonomic^2 * p_taxonomic_species);
-  real<lower = 0, upper = 1> sigma_taxonomic_genus = sqrt(sigma_taxonomic^2 * p_taxonomic_genus);
-  real<lower = 0, upper = 1> sigma_taxonomic_family = sqrt(sigma_taxonomic^2 * (1 - p_taxonomic_genus - p_taxonomic_species));
+  real<lower = 0> sigma_spatial_plot = sqrt(sigma_spatial^2 * p_spatial_plot);
+  real<lower = 0> sigma_spatial_transect = sqrt(sigma_spatial^2 * (1 - p_spatial_plot));
+  real<lower = 0> sigma_taxonomic_species = sqrt(sigma_taxonomic^2 * p_taxonomic_species);
+  real<lower = 0> sigma_taxonomic_genus = sqrt(sigma_taxonomic^2 * p_taxonomic_genus);
+  real<lower = 0> sigma_taxonomic_family = sqrt(sigma_taxonomic^2 * (1 - p_taxonomic_genus - p_taxonomic_species));
   
   vector[n_transect] a_transect = a_transect_raw * sigma_spatial_transect;
   vector[n_plot] a_plot = a_plot_raw * sigma_spatial_plot;
