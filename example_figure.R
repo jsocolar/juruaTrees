@@ -2,10 +2,10 @@
 source("/Users/jacobsocolar/Dropbox/Work/Code/juruaTrees/AGBmc2.R")
 source("/Users/jacobsocolar/Dropbox/Work/Code/juruaTrees/predict_heights.R")
 
-height_coord_posterior <- readRDS("/Users/JacobSocolar/Dropbox/Work/JuruaTrees/height_coord_posterior.RDS")
+height_coord_posterior <- readRDS("/Users/JacobSocolar/Dropbox/Work/JuruaTrees/Data_objects/height_coord_posterior.RDS")
 
 # Import the data list and edit a couple of typos
-data_list <- readxl::read_xlsx("/Users/jacobsocolar/Downloads/percent_table.xlsx")
+data_list <- readxl::read_xlsx("/Users/JacobSocolar/Dropbox/Work/JuruaTrees/Data_objects/percent_table.xlsx")
 unique(data_list$data_set)
 data_list$data_set[data_list$data_set == "Hestem_data_v"] <- "HEstem_data_v"
 data_list$data_set[data_list$data_set == "Hefam_v"] <- "HEfam_v"
@@ -14,7 +14,7 @@ data_list$data_set[data_list$data_set == "Hefam_t"] <- "HEfam_t"
 data_list <- data_list[-c(65,66),]
 
 # Import a list of all the necessary datasets
-dataset_list <- readRDS("/Users/JacobSocolar/Desktop/dataset_list.RDS")
+dataset_list <- readRDS("/Users/JacobSocolar/Dropbox/Work/JuruaTrees/Data_objects/dataset_list.RDS")
 
 # Do the agb calculations
 agb <- list()
