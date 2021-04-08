@@ -1,4 +1,5 @@
 # Load up the necessary functions
+library(BIOMASS)
 source("/Users/jacobsocolar/Dropbox/Work/Code/juruaTrees/AGBmc2.R")
 
 # Read in the tree data
