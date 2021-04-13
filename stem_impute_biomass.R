@@ -103,14 +103,23 @@ for(i in 1:nrow(trees)){
   }else if(trees$Habitat[i] == "tf"){
     trees$height_best[i] <- trees$height_t_model[i]
   }
-  
 }
 
-varzea <- trees[trees$Habitat == "vz", c("DBH_cm", "wd_best", "height_best")]
-tf <- trees[trees$Habitat == "tf", c("DBH_cm", "wd_best", "height_best")]
+vztf2<-subset(trees, plot_ID == "OupA_P1"|trees$plot_ID == "SjoA_P1"|trees$plot_ID == "PupB_P1"|trees$plot_ID == 
+                "XbaA_P1"|trees$plot_ID == "BauA_P2"|trees$plot_ID == "SanA_P3"|trees$plot_ID == "BojA_P1"|
+                trees$plot_ID == "SanB_P3"|trees$plot_ID == "ItaB_P2"|trees$plot_ID == "MltB_P3"|trees$plot_ID == 
+                "MltB_P2"|trees$plot_ID == "XznA_P5"|trees$plot_ID == "SanB_P1"|trees$plot_ID == "BojE_P5"|
+                trees$plot_ID == "MltB_P5"|trees$plot_ID == "ItaB_P3"|trees$plot_ID == "McmB_P2"|trees$plot_ID == 
+                "McmX_P2"|trees$plot_ID == "MltB_P4"|trees$plot_ID == "McmB_P3"|trees$plot_ID == "SanB_P2"|
+                trees$plot_ID == "GoiD_P2"|trees$plot_ID == "SanB_P4"|trees$plot_ID == "CarD_P1"|trees$plot_ID == 
+                "NhzA_P3"|trees$plot_ID == "BojE_P2"|trees$plot_ID == "McmX_P1"|trees$plot_ID == "BelB_P1")
+
+
+varzea <- vztf2[vztf2$Habitat == "vz", c("DBH_cm", "wd_best", "height_best")]
+tf <- vztf2[vztf2$Habitat == "tf", c("DBH_cm", "wd_best", "height_best")]
 
 varzea_agb <- BIOMASS::AGBmonteCarlo(D = varzea$DBH_cm, WD = varzea$wd_best, errWD = rep(0, nrow(varzea)), H = varzea$height_best, errH = 0)
 tf_agb <- BIOMASS::AGBmonteCarlo(D = tf$DBH_cm, WD = tf$wd_best, errWD = rep(0, nrow(tf)), H = tf$height_best, errH = 0)
 
-varzea_agb$meanAGB
-tf_agb$meanAGB
+varzea_agb$meanAGB/2.1
+tf_agb$meanAGB/.7
