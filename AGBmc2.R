@@ -39,7 +39,7 @@ stemwise_AGB_diff <- function (D, WD1, WD2 = NULL, H1, H2 = NULL) {
   AGB_simu2 <- exp(Comp2)/1000
   
   return(list(agb_1 = AGB_simu1, agb_2 = AGB_simu2, 
-              stemwise_AGB_diff = AGB_simu1-AGB_simu2,
+              stemwise_AGB_diff = AGB_simu2-AGB_simu1,
               stemwise_AGB_logratio = log(AGB_simu2/AGB_simu1)))
 }
 
